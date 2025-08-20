@@ -7,4 +7,6 @@ class Urls {
   static const String taskCountByStatusUrl = '$_baseUrl/taskStatusCount';
   static String taskListByStatusUrl(String status) =>
       '$_baseUrl/listTaskByStatus/$status';
+
+  static const String updateProfileUrl = '$_baseUrl/profileUpdate';
 }

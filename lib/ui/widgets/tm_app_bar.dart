@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:task_managers/ui/controllers/auth_controller.dart';
 import 'package:task_managers/ui/screens/sign_in_screen.dart';
@@ -16,7 +18,13 @@ class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: AppColors.themeColor,
       title: Row(
         children: [
-          CircleAvatar(radius: 16),
+          CircleAvatar(
+            radius: 16,
+            backgroundImage: MemoryImage(
+              base64Decode(AuthController.userModel?.photo ?? ''),
+            ),
+            onBackgroundImageError: (_, __) => const Icon(Icons.person_outline),
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: GestureDetector(
@@ -57,5 +65,5 @@ class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(56.0);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

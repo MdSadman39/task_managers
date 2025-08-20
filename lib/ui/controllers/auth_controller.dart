@@ -9,14 +9,16 @@ class AuthController {
 
   static const String _accessTokenKey = 'access_token';
   static const String _userDataKey = 'user_data';
-
+  //save user information
   static Future<void> saveUserData(String token, UserModel model) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setString(_accessTokenKey, token);
     await sharedPreferences.setString(_userDataKey, jsonEncode(model.toJson()));
+
     accessToken = token;
     userModel = model;
   }
+  // Get user information
 
   static Future<void> getUserData() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -26,6 +28,7 @@ class AuthController {
     accessToken = token;
     userModel = UserModel.fromJson(jsonDecode(userData!));
   }
+  // Check if user already logged in
 
   static Future<bool> isUserLoggedIn() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
