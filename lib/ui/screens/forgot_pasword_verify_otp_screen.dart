@@ -1,13 +1,17 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:task_managers/data/services/network_caller.dart';
+import 'package:task_managers/ui/widgets/snack_bar_message.dart';
+import '../../data/utils/urls.dart';
 import '../utils/app_colors.dart';
 import '../widgets/screen_background.dart';
 import 'forgot_password_reset_password_screen.dart';
 import 'sign_in_screen.dart';
 
 class ForgotPasswordVerifyOtpScreen extends StatefulWidget {
-  const ForgotPasswordVerifyOtpScreen({super.key});
+  const ForgotPasswordVerifyOtpScreen({super.key, this.email});
+  final String? email;
 
   static const String name = '/forgot-password/verify-otp';
 
@@ -20,6 +24,7 @@ class _ForgotPasswordVerifyOtpScreenState
     extends State<ForgotPasswordVerifyOtpScreen> {
   final TextEditingController _otpTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _verifyOtpInProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +55,7 @@ class _ForgotPasswordVerifyOtpScreenState
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        ForgotPasswordResetPasswordScreen.name,
-                      );
+                      _onTapForgotPasswordOtp();
                     },
                     child: const Text('Verify'),
                   ),
@@ -66,6 +68,41 @@ class _ForgotPasswordVerifyOtpScreenState
         ),
       ),
     );
+  }
+
+  void _onTapForgotPasswordOtp() {
+    if (_formKey.currentState!.validate()) {
+      _verifyOtp();
+    }
+  }
+
+  Future<void> _verifyOtp() async {
+    _verifyOtpInProgress = true;
+    setState(() {});
+    final NetworkResponse response = await NetworkCaller.getRequest(
+      url: Urls.forgotVerifyOtpUrl(
+        widget.email.toString(),
+        _otpTEController.text,
+      ),
+    );
+
+    if (response.responseData?['status'] != 'success') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return ForgotPasswordResetPasswordScreen(
+              email: widget.email,
+              otp: _otpTEController.text,
+            );
+          },
+        ),
+      );
+    } else {
+      showSnackBarMessage(context, response.errorMessage);
+    }
+    _verifyOtpInProgress = false;
+    setState(() {});
   }
 
   Widget _buildPinCodeTextField() {
